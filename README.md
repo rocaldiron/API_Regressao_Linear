@@ -6,6 +6,54 @@ Rodrigues, Lara Maria Herrera Drugowick e Rodrigo Caldiron, como parte
 das atividades realizadas na disciplina de ME918-2S-2024 (Produto de
 Dados) do curso de Estatística da UNICAMP.
 
+**Resumo:** API REST em R (pacote `plumber`) que gerencia um pequeno banco de
+dados e, a cada alteração, reajusta um modelo de regressão linear com uma
+variável numérica e uma categórica. As estimativas, p-valores, resíduos,
+predições e gráficos são expostos como rotas HTTP.
+
+**Stack:** R · plumber · ggplot2 · dplyr · ggfocus · jsonlite · Swagger (OpenAPI)
+
+## Como executar
+
+1. Clone o repositório e abra `API_Regressao_Linear.Rproj` no RStudio (ou defina
+   a pasta do projeto como diretório de trabalho, pois a API lê
+   `dados/dados_regressao.csv`).
+2. Instale as dependências:
+
+```r
+install.packages(c("plumber", "ggplot2", "dplyr", "farver", "jsonlite",
+                   "ggfocus", "readr", "lubridate"))
+```
+
+3. Inicie a API:
+
+```r
+plumber::pr_run(plumber::pr("plumber.R"), port = 8000)
+```
+
+4. Acesse a documentação interativa (Swagger) em
+   `http://127.0.0.1:8000/__docs__/`.
+
+As rotas de adição, alteração e remoção reescrevem `dados/dados_regressao.csv`
+e reajustam o modelo.
+
+## Rotas em resumo
+
+| Método | Rota | O que faz |
+|---|---|---|
+| POST | `/data/add_row` | Adiciona uma observação (`x`, `grupo`, `y`) |
+| PUT | `/data/change_row` | Altera uma observação pelo `ID` |
+| DELETE | `/data/delete_row` | Remove observações pelo `ID` (um, sequência `1:3` ou vetor `1,3,5`) |
+| GET | `/fit/param` | Estimativas dos parâmetros e QME |
+| GET | `/fit/p_values` | P-valores dos parâmetros |
+| GET | `/fit/residuals` | Resíduos do modelo |
+| GET | `/fit/pred` | Predições para novos `x` e `grupo` |
+| GET | `/plot/lm` | Dispersão com a reta ajustada por grupo (parâmetro opcional `focus`) |
+| GET | `/plot/residuals` | Resíduos contra valores preditos |
+| GET | `/plot/residuals_qq` | QQ-plot dos resíduos |
+
+Os exemplos de uso de cada rota estão nas seções abaixo.
+
 ## Introdução
 
 `API_Regressao_Linear` é uma interface que permite ao usuário interagir
